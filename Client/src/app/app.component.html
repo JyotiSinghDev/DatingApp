@@ -1,0 +1,17 @@
+<h1>{{title}}</h1>
+<!-- Note : both are workinng code in angular 17 we can apply like @for and in that case we don't 
+need to import ngFor -->
+
+<!-- <ul>
+  <li *ngFor = "let user of users">
+     {{user.id}}-{{user.userName}}
+  </li>
+</ul> -->
+
+<ul>
+  @for (user of users; track user.id) {
+    <li>
+      {{user.id}}-{{user.userName}}
+   </li>
+  }
+</ul>
