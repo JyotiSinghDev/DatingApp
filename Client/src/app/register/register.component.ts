@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, inject, Input, input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -12,6 +13,7 @@ import { AccountService } from '../_services/account.service';
 })
 export class RegisterComponent {
   accountService = inject(AccountService);
+  toastr = inject(ToastrService)
   model: any={};
   @Input() usersFromHomeComponent:any;
   @Output() cancelRegister = new EventEmitter();
@@ -22,7 +24,7 @@ export class RegisterComponent {
         console.log(response);
         this.cancel();
       },
-      error:error=>{console.log(error)}
+      error:error=>{this.toastr.error(error.error)}
     })
   }
   cancel() {
