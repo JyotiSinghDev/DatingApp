@@ -5,6 +5,7 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,23 +15,23 @@ namespace API.Controllers
     public class AccountController(DataContext _context , ITokenService tokenService) : BaseApiController
     {
         [HttpPost("register")]
-        public async Task<ActionResult<UserDTO>> Register(RegisterDto registerDto){
-            if( await IfUserExist(registerDto.username.ToLower())) 
+        public async Task<ActionResult<UserDTO>> Register(RegisterDto registerDto,IMapper mapper){
+            if( await IfUserExist(registerDto.Username.ToLower())) 
             return BadRequest("Username is taken.");
-            return Ok();
-            // using var hmac = new HMACSHA512();
-            // var user = new AppUser
-            // {
-            //     UserName = registerDto.username.ToLower(),
-            //     PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.password)),
-            //     PasswordSalt =hmac.Key
-            // };
-            // _context.Users.Add(user);
-            // await _context.SaveChangesAsync();
-            // return new UserDTO{
-            //     Username =user.UserName,
-            //     Token = tokenService.CreateToken(user)
-            // };
+            
+            using var hmac = new HMACSHA512();
+            var user = mapper.Map<AppUser>(registerDto);
+            user.UserName = registerDto.Username.ToLower();
+            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
+            user.PasswordSalt =hmac.Key;
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return new UserDTO{
+                Username =user.UserName,
+                KnownAs = user.KnownAs,
+                Token = tokenService.CreateToken(user)
+            };
         }
 
       [HttpPost("login")]
@@ -48,6 +49,7 @@ namespace API.Controllers
 
         return new UserDTO{
             Username =user.UserName,
+            KnownAs = user.KnownAs,
             Token = tokenService.CreateToken(user)
         };
        }

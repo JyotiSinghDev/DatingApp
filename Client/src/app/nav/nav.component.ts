@@ -13,7 +13,6 @@ import { TitleCasePipe } from '@angular/common';
   standalone: true,
   imports: [
     FormsModule,
-    NgIf,
     BsDropdownModule,
     RouterLink,
     RouterLinkActive,
